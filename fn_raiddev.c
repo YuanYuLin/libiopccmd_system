@@ -137,7 +137,7 @@ uint32_t hn_raiddev(uint8_t* preq, uint8_t* pres)
     break;
     case SERVICE_ACTION_START_SPECIFIC:
         GET_INSTANCE_CFG_STATUS()->set_service_starting(SERVICE_NAME);
-	GET_INSTANCEMISC_OBJ()->create_task_with_arg(action_start, (void*)arg, sizeof(struct arg_t));
+	GET_INSTANCE_MISC_OBJ()->create_task_with_arg(action_start, (void*)arg, sizeof(struct arg_t));
     break;
     default:
         res->status = 0x01;

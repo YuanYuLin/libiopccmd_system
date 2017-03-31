@@ -38,7 +38,7 @@ uint32_t hn_mkbtrfs(uint8_t* preq, uint8_t* pres)
         return sizeof(struct res_mkbtrfs_t);
     }
 
-    GET_INSTANCE_CFG_STATUS(ops_cfg_bdb_status)->set_progress_status(PROGRESS_NAME, STAGE_STATUS(PS_STAGE_INPROGRESS));
+    GET_INSTANCE_CFG_STATUS()->set_progress_status(PROGRESS_NAME, STAGE_STATUS(PS_STAGE_INPROGRESS));
 
     res->status = 0;
     res->progress_id = progress_id;
