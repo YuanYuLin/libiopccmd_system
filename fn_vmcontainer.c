@@ -6,8 +6,8 @@
 
 #include "iopcdefine.h"
 #include "iopcops_misc.h"
-#include "iopcops_cfg_bdb_status.h"
-#include "iopcops_cfg_bdb_vm.h"
+#include "iopcops_cfg_status.h"
+#include "iopcops_cfg_vm.h"
 #include "iopccmd_service.h"
 
 #define SERVICE_PRE_VM	"prevm"
@@ -51,16 +51,16 @@ static void startByIndex(uint8_t cfg_idx)
     uint8_t cmd_str[STR_LEN];
 
         memset(vm_name, 0, STR_LEN);
-	GET_INSTANCE(ops_cfg_bdb_vm)->get_name(cfg_idx, &vm_name[0]);
+	GET_INSTANCE_CFG_VM()->get_name(cfg_idx, &vm_name[0]);
 
 	memset(vm_nettype, 0, STR_LEN);
-	GET_INSTANCE(ops_cfg_bdb_vm)->get_nettype(cfg_idx, &vm_nettype[0]);
+	GET_INSTANCE_CFG_VM()->get_nettype(cfg_idx, &vm_nettype[0]);
 
 	memset(vm_nethwlink, 0, STR_LEN);
-	GET_INSTANCE(ops_cfg_bdb_vm)->get_nethwlink(cfg_idx, &vm_nethwlink[0]);
+	GET_INSTANCE_CFG_VM()->get_nethwlink(cfg_idx, &vm_nethwlink[0]);
 
 	memset(vm_nethwaddr, 0, STR_LEN);
-	GET_INSTANCE(ops_cfg_bdb_vm)->get_nethwaddr(cfg_idx, &vm_nethwaddr[0]);
+	GET_INSTANCE_CFG_VM()->get_nethwaddr(cfg_idx, &vm_nethwaddr[0]);
 
 	memset(vm_ipaddress, 0, STR_LEN);
 	sprintf(vm_ipaddress, "192.168.200.%d/24", (1 + cfg_idx));
@@ -68,25 +68,25 @@ static void startByIndex(uint8_t cfg_idx)
 	memset(vm_gateway, 0, STR_LEN);
 	sprintf(vm_gateway, "192.168.200.254");
 
-        vm_autostart = GET_INSTANCE(ops_cfg_bdb_vm)->get_autostart(cfg_idx);
+        vm_autostart = GET_INSTANCE_CFG_VM()->get_autostart(cfg_idx);
 
         memset(vm_rootfs, 0, STR_LEN);
         sprintf(vm_rootfs, VM_OVERLAYFS, vm_name, "rootfs");
-        GET_INSTANCE(ops_misc)->create_dir_recursive(vm_rootfs, DEFAULT_MODE);
+        GET_INSTANCE_MISC_OBJ()->create_dir_recursive(vm_rootfs, DEFAULT_MODE);
 
 	memset(vm_fstab, 0, STR_LEN);
 	sprintf(vm_fstab, "%s%s", vm_rootfs, "/etc/fstab");
 
         memset(vm_lower, 0, STR_LEN);
-	GET_INSTANCE(ops_cfg_bdb_vm)->get_base_path(cfg_idx, &vm_lower[0]);
+	GET_INSTANCE_CFG_VM()->get_base_path(cfg_idx, &vm_lower[0]);
 
         memset(vm_upper, 0, STR_LEN);
         sprintf(vm_upper, VM_OVERLAYFS, vm_name, "upper");
-        GET_INSTANCE(ops_misc)->create_dir_recursive(vm_upper, DEFAULT_MODE);
+        GET_INSTANCE_MISC_OBJ()->create_dir_recursive(vm_upper, DEFAULT_MODE);
 
         memset(vm_work, 0, STR_LEN);
         sprintf(vm_work, VM_OVERLAYFS, vm_name, "work");
-        GET_INSTANCE(ops_misc)->create_dir_recursive(vm_work, DEFAULT_MODE);
+        GET_INSTANCE_MISC_OBJ()->create_dir_recursive(vm_work, DEFAULT_MODE);
 
         memset(vm_opts, 0, STR_LEN);
         sprintf(vm_opts, "lowerdir=%s,upperdir=%s,workdir=%s", vm_lower, vm_upper, vm_work);
@@ -157,12 +157,12 @@ static void startByIndex(uint8_t cfg_idx)
 		return ;
             }
             printf("AutoStart [%s]\n", vm_name);
-	    if(GET_INSTANCE(ops_misc)->is_mountfs_by_src_dst_type(vm_name, vm_rootfs, "overlay") == 0) {
-	        GET_INSTANCE(ops_misc)->mountfs(vm_name, vm_rootfs, "overlay", 0, vm_opts);
+	    if(GET_INSTANCE_MISC_OBJ()->is_mountfs_by_src_dst_type(vm_name, vm_rootfs, "overlay") == 0) {
+	        GET_INSTANCE_MISC_OBJ()->mountfs(vm_name, vm_rootfs, "overlay", 0, vm_opts);
             }
 	    memset(cmd_str, 0, STR_LEN);
 	    sprintf(cmd_str, "iopcvm %s", vm_name);
-	    GET_INSTANCE(ops_misc)->execute_cmd(cmd_str, NULL);
+	    GET_INSTANCE_MISC_OBJ()->execute_cmd(cmd_str, NULL);
         } else {
             printf("Not AutoStart [%s]\n", vm_name);
 	}
@@ -189,17 +189,17 @@ static void* action_start(void* arg)
 //    GET_INSTANCE(ops_cfg_bdb_status)->set_service_starting(SERVICE_NAME);
 
     if(arg == NULL) {
-        GET_INSTANCE(ops_cfg_bdb_status)->wait_service_started(SERVICE_WAIT);
+        GET_INSTANCE_CFG_STATUS()->wait_service_started(SERVICE_WAIT);
 
-        if(GET_INSTANCE(ops_cfg_bdb_status)->is_service_started(SERVICE_PRE_VM) == 0) {
-            GET_INSTANCE(ops_cfg_bdb_status)->set_service_starting(SERVICE_PRE_VM);
+        if(GET_INSTANCE_CFG_STATUS()->is_service_started(SERVICE_PRE_VM) == 0) {
+            GET_INSTANCE_CFG_STATUS()->set_service_starting(SERVICE_PRE_VM);
 
-            GET_INSTANCE(ops_misc)->create_system_by_list(init_list_size, &init_list[0]);
+            GET_INSTANCE_MISC_OBJ()->create_system_by_list(init_list_size, &init_list[0]);
 
-            GET_INSTANCE(ops_cfg_bdb_status)->set_service_started(SERVICE_PRE_VM);
+            GET_INSTANCE_CFG_STATUS()->set_service_started(SERVICE_PRE_VM);
         }
 
-        cfg_size = GET_INSTANCE(ops_cfg_bdb_vm)->get_cfg_size();
+        cfg_size = GET_INSTANCE_CFG_VM()->get_cfg_size();
 
         printf("VM count %d\n", cfg_size);
         for(cfg_idx = 0;cfg_idx < cfg_size;cfg_idx++) {
@@ -210,7 +210,7 @@ static void* action_start(void* arg)
 	startByIndex(parm->index);
     }
 
-    GET_INSTANCE(ops_cfg_bdb_status)->set_service_started(SERVICE_NAME);
+    GET_INSTANCE_CFG_STATUS()->set_service_started(SERVICE_NAME);
     if(arg != NULL)
         free(arg);
     pthread_exit((void*)0);
@@ -240,7 +240,7 @@ uint32_t hn_vmcontainer(uint8_t* preq, uint8_t* pres)
     case SERVICE_ACTION_STATUS:
     break;
     case SERVICE_ACTION_START:
-	GET_INSTANCE(ops_misc)->create_task(action_start);
+	GET_INSTANCE_MISC_OBJ()->create_task(action_start);
     break;
     case SERVICE_ACTION_STOP:
         action_stop(NULL);
@@ -251,13 +251,13 @@ uint32_t hn_vmcontainer(uint8_t* preq, uint8_t* pres)
     case SERVICE_ACTION_STATUS_SPECIFIC:
     break;
     case SERVICE_ACTION_START_SPECIFIC:
-        GET_INSTANCE(ops_cfg_bdb_status)->set_service_starting(SERVICE_NAME);
+        GET_INSTANCE_CFG_STATUS()->set_service_starting(SERVICE_NAME);
 	//arg = (void*)req;
 	//for(i=0;i<=sizeof(struct req_service_t);i++) {
 	//	printf("%x,", preq[i]);
 	//}
 	//printf("\n");
-        GET_INSTANCE(ops_misc)->create_task_with_arg(action_start, (void*)arg, sizeof(struct arg_t));
+        GET_INSTANCE_MISC_OBJ()->create_task_with_arg(action_start, (void*)arg, sizeof(struct arg_t));
     break;
     case SERVICE_ACTION_STOP_SPECIFIC:
     break;
@@ -266,7 +266,7 @@ uint32_t hn_vmcontainer(uint8_t* preq, uint8_t* pres)
     break;
     }
 
-    res->service_status = GET_INSTANCE(ops_cfg_bdb_status)->get_service_status(SERVICE_NAME);
+    res->service_status = GET_INSTANCE_CFG_STATUS()->get_service_status(SERVICE_NAME);
     res->action = req->action;
 
     return sizeof(struct res_service_t);

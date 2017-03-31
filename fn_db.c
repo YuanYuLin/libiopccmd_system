@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "iopcdefine.h"
-#include "iopcops_cfg_bdb.h"
+#include "iopcops_cfg.h"
 #include "iopccmd_service.h"
 #include "iopccmd_db.h"
 

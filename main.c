@@ -25,6 +25,7 @@ DEFINE_EXTERN_FN(hn_raiddev);
 DEFINE_EXTERN_FN(hn_raiddevcount);
 DEFINE_EXTERN_FN(hn_raiddevget);
 DEFINE_EXTERN_FN(hn_raiddevset);
+/*
 DEFINE_EXTERN_FN(hn_db_setbool_f);
 DEFINE_EXTERN_FN(hn_db_getbool_f);
 DEFINE_EXTERN_FN(hn_db_setuint32_f);
@@ -39,7 +40,7 @@ DEFINE_EXTERN_FN(hn_db_getuint32_r);
 DEFINE_EXTERN_FN(hn_db_setstring_r);
 DEFINE_EXTERN_FN(hn_db_getstring_r);
 DEFINE_EXTERN_FN(hn_db_restore2default);
-
+*/
 struct cmd_desc_t cmd_descs[] = {
     { "mkbtrfs"			,NULL, hn_mkbtrfs		},
     { "mkbtrfs_status"		,NULL, hn_mkbtrfs_status	},
@@ -64,7 +65,7 @@ struct cmd_desc_t cmd_descs[] = {
     { "raiddevcount"		,NULL, hn_raiddevcount		},
     { "raiddevget"		,NULL, hn_raiddevget		},
     { "raiddevset"		,NULL, hn_raiddevset		},
-
+/*
     { "db_setbool_f"		,NULL, hn_db_setbool_f		},
     { "db_getbool_f"		,NULL, hn_db_getbool_f		},
     { "db_setuint32_f"		,NULL, hn_db_setuint32_f	},
@@ -80,7 +81,7 @@ struct cmd_desc_t cmd_descs[] = {
     { "db_setstring_r"		,NULL, hn_db_setstring_r	},
     { "db_getstring_r"		,NULL, hn_db_getstring_r	},
     { "db_restore2default"	,NULL, hn_db_restore2default	},
-
+*/
     { ""			,NULL, NULL			}
 };
 

@@ -13,7 +13,7 @@ LDFLAGS += -llxc
 SRC = 
 SRC += main.c
 
-SRC += fn_db.c
+#SRC += fn_db.c
 SRC += fn_netdev.c
 SRC += fn_netntp.c
 SRC += fn_netssh.c

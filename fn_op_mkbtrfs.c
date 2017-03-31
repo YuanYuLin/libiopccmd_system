@@ -5,7 +5,7 @@
 
 #include "iopcdefine.h"
 #include "iopcops_misc.h"
-#include "iopcops_cfg_bdb_status.h"
+#include "iopcops_cfg_status.h"
 //#include "iopccmd_service.h"
 #include "iopccmd_op_mkbtrfs.h"
 
@@ -18,8 +18,8 @@ static void* action_exec(void* arg)
 {
     uint8_t *cmd_str = (uint8_t*)arg;
     //mkfs.btrfs -m raid1 -d raid1 /dev/sdb /dev/sdc -f
-    GET_INSTANCE(ops_misc)->execute_cmd(cmd_str, NULL);
-    GET_INSTANCE(ops_cfg_bdb_status)->set_progress_status(PROGRESS_NAME, STAGE_STATUS(PS_STAGE_SUCCESSED));
+    GET_INSTANCE_MISC_OBJ()->execute_cmd(cmd_str, NULL);
+    GET_INSTANCE_CFG_STATUS()->set_progress_status(PROGRESS_NAME, STAGE_STATUS(PS_STAGE_SUCCESSED));
     if(arg != NULL)
         free(arg);
     pthread_exit((void*)0);
@@ -33,12 +33,12 @@ uint32_t hn_mkbtrfs(uint8_t* preq, uint8_t* pres)
     int i = 0;
     int enabled_count = 0;
 
-    if((GET_INSTANCE(ops_cfg_bdb_status)->get_progress_status(PROGRESS_NAME) & (PS_TYPE_MASK | PS_STAGE_MASK)) == STAGE_STATUS(PS_STAGE_INPROGRESS)) {
+    if((GET_INSTANCE_CFG_STATUS()->get_progress_status(PROGRESS_NAME) & (PS_TYPE_MASK | PS_STAGE_MASK)) == STAGE_STATUS(PS_STAGE_INPROGRESS)) {
         res->status = 0xF0;
         return sizeof(struct res_mkbtrfs_t);
     }
 
-    GET_INSTANCE(ops_cfg_bdb_status)->set_progress_status(PROGRESS_NAME, STAGE_STATUS(PS_STAGE_INPROGRESS));
+    GET_INSTANCE_CFG_STATUS(ops_cfg_bdb_status)->set_progress_status(PROGRESS_NAME, STAGE_STATUS(PS_STAGE_INPROGRESS));
 
     res->status = 0;
     res->progress_id = progress_id;
@@ -47,12 +47,12 @@ uint32_t hn_mkbtrfs(uint8_t* preq, uint8_t* pres)
     sprintf(cmd_str, "mkfs.btrfs -f -m %s -d %s ", req->type);
     if(req->dev_size < MIN_RAID_COUNT) {
         res->status = 2;
-        GET_INSTANCE(ops_cfg_bdb_status)->set_progress_status(PROGRESS_NAME, STAGE_STATUS(PS_STAGE_FAILED | 2));
+        GET_INSTANCE_CFG_STATUS()->set_progress_status(PROGRESS_NAME, STAGE_STATUS(PS_STAGE_FAILED | 2));
 	return sizeof(struct res_mkbtrfs_t);
     }
     if(req->dev_size > MAX_RAID_COUNT) {
         res->status = 1;
-        GET_INSTANCE(ops_cfg_bdb_status)->set_progress_status(PROGRESS_NAME, STAGE_STATUS(PS_STAGE_FAILED | 1));
+        GET_INSTANCE_CFG_STATUS()->set_progress_status(PROGRESS_NAME, STAGE_STATUS(PS_STAGE_FAILED | 1));
         return sizeof(struct res_mkbtrfs_t);
     }
 
@@ -66,11 +66,11 @@ uint32_t hn_mkbtrfs(uint8_t* preq, uint8_t* pres)
 
     if(enabled_count < MIN_RAID_COUNT) {
         res->status = 3;
-        GET_INSTANCE(ops_cfg_bdb_status)->set_progress_status(PROGRESS_NAME, STAGE_STATUS(PS_STAGE_FAILED | 3));
+        GET_INSTANCE_CFG_STATUS()->set_progress_status(PROGRESS_NAME, STAGE_STATUS(PS_STAGE_FAILED | 3));
         return sizeof(struct res_mkbtrfs_t);
     }
 
-    GET_INSTANCE(ops_misc)->create_task_with_arg(action_exec, (void*)req, sizeof(struct req_mkbtrfs_t));
+    GET_INSTANCE_MISC_OBJ()->create_task_with_arg(action_exec, (void*)req, sizeof(struct req_mkbtrfs_t));
 
     return sizeof(struct res_mkbtrfs_t);
 }
@@ -85,7 +85,7 @@ uint32_t hn_mkbtrfs_status(uint8_t* preq, uint8_t* pres)
         res->status = 1;
 	return sizeof(struct res_mkbtrfs_status_t);
     }
-    res->progress_status = GET_INSTANCE(ops_cfg_bdb_status)->get_progress_status(PROGRESS_NAME);
+    res->progress_status = GET_INSTANCE_CFG_STATUS()->get_progress_status(PROGRESS_NAME);
     return sizeof(struct res_mkbtrfs_status_t);
 }
 

@@ -5,7 +5,7 @@
 
 #include "iopcdefine.h"
 #include "iopcops_misc.h"
-#include "iopcops_cfg_bdb_status.h"
+#include "iopcops_cfg_status.h"
 #include "iopccmd_service.h"
 
 #define SERVICE_NAME		"netssh"
@@ -32,25 +32,25 @@ static void* action_start(void* arg)
 
     printf("Starting Network SSH...\n");
 
-    GET_INSTANCE(ops_cfg_bdb_status)->wait_service_started(SERVICE_WAIT);
+    GET_INSTANCE_CFG_STATUS()->wait_service_started(SERVICE_WAIT);
 
-    GET_INSTANCE(ops_misc)->create_system_by_list(ssh_init_list_size, &ssh_init_list[0]);
+    GET_INSTANCE_MISC_OBJ()->create_system_by_list(ssh_init_list_size, &ssh_init_list[0]);
 
     //Generate key...
     printf("Generating dropbear key...\n");
     memset(cmd, 0, sizeof(cmd));
     sprintf(cmd, "%s -t rsa -f %s/%s", dropbearkey_link, dropbear_cfg, dropbear_key_rsa);
-    GET_INSTANCE(ops_misc)->execute_cmd(cmd, NULL);
+    GET_INSTANCE_MISC_OBJ()->execute_cmd(cmd, NULL);
 
     printf("Starting dropbear...\n");
     memset(cmd, 0, sizeof(cmd));
     //sprintf(cmd, "%s -r %s/%s -R -E -s -g -F", dropbear_bin, dropbear_cfg, dropbear_key_rsa);
     sprintf(cmd, "%s -r %s/%s -s -g -E ", dropbear_bin, dropbear_cfg, dropbear_key_rsa);
-    GET_INSTANCE(ops_misc)->execute_cmd(cmd, NULL);
+    GET_INSTANCE_MISC_OBJ()->execute_cmd(cmd, NULL);
 
     printf("Set service started...\n");
-    GET_INSTANCE(ops_cfg_bdb_status)->set_service_started(SERVICE_NAME);
-    GET_INSTANCE(ops_cfg_bdb_status)->wait_service_stoped(SERVICE_NAME);
+    GET_INSTANCE_CFG_STATUS()->set_service_started(SERVICE_NAME);
+    GET_INSTANCE_CFG_STATUS()->wait_service_stoped(SERVICE_NAME);
 
     pthread_exit((void*)0);
     return 0;
@@ -74,11 +74,11 @@ uint32_t hn_netssh(uint8_t* preq, uint8_t* pres)
     case SERVICE_ACTION_STATUS:
     break;
     case SERVICE_ACTION_START:
-        GET_INSTANCE(ops_cfg_bdb_status)->set_service_starting(SERVICE_NAME);
-        GET_INSTANCE(ops_misc)->create_task(action_start);
+        GET_INSTANCE_CFG_STATUS()->set_service_starting(SERVICE_NAME);
+        GET_INSTANCE_MISC_OBJ()->create_task(action_start);
     break;
     case SERVICE_ACTION_STOP:
-        GET_INSTANCE(ops_cfg_bdb_status)->set_service_stoping(SERVICE_NAME);
+        GET_INSTANCE_CFG_STATUS()->set_service_stoping(SERVICE_NAME);
         action_stop(NULL);
     break;
     case SERVICE_ACTION_RESTART:
@@ -90,7 +90,7 @@ uint32_t hn_netssh(uint8_t* preq, uint8_t* pres)
     }
 
     res->action = req->action;
-    res->service_status = GET_INSTANCE(ops_cfg_bdb_status)->get_service_status(SERVICE_NAME);
+    res->service_status = GET_INSTANCE_CFG_STATUS()->get_service_status(SERVICE_NAME);
 
     return sizeof(struct res_service_t);
 }

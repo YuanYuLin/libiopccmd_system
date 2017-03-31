@@ -26,7 +26,7 @@ uint32_t hn_vmadd(uint8_t* preq, uint8_t* pres)
     printf("nethwaddr:%s\n", req->nethwaddr);
     printf("add_vm end\n");
 */
-    vm_idx = GET_INSTANCE(ops_cfg_bdb_vm)->add_vm(req->auto_start, req->name, req->base_path, req->nettype, req->nethwlink, req->nethwaddr);
+    vm_idx = GET_INSTANCE_CFG_VM()->add_vm(req->auto_start, req->name, req->base_path, req->nettype, req->nethwlink, req->nethwaddr);
     res->index = vm_idx;
 
 

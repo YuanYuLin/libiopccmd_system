@@ -6,8 +6,8 @@
 
 #include "iopcdefine.h"
 #include "iopcops_misc.h"
-#include "iopcops_cfg_bdb_status.h"
-#include "iopcops_cfg_bdb_vm.h"
+#include "iopcops_cfg_status.h"
+#include "iopcops_cfg_vm.h"
 #include "iopccmd_vmset.h"
 
 uint32_t hn_vmset(uint8_t* preq, uint8_t* pres)
@@ -19,18 +19,18 @@ uint32_t hn_vmset(uint8_t* preq, uint8_t* pres)
     res->status = 0;
     vm_index = req->index;
 
-    vm_count = GET_INSTANCE(ops_cfg_bdb_vm)->get_cfg_size();
+    vm_count = GET_INSTANCE_CFG_VM()->get_cfg_size();
     if(vm_index >= vm_count) {
 	    res->status = 1;
 	    return sizeof(struct res_vmset_t);
     }
 
-    GET_INSTANCE(ops_cfg_bdb_vm)->set_autostart(vm_index, req->auto_start);
-    GET_INSTANCE(ops_cfg_bdb_vm)->set_name(vm_index, req->name);
-    GET_INSTANCE(ops_cfg_bdb_vm)->set_base_path(vm_index, req->base_path);
-    GET_INSTANCE(ops_cfg_bdb_vm)->set_nettype(vm_index, req->nettype);
-    GET_INSTANCE(ops_cfg_bdb_vm)->set_nethwlink(vm_index, req->nethwlink);
-    GET_INSTANCE(ops_cfg_bdb_vm)->set_nethwaddr(vm_index, req->nethwaddr);
+    GET_INSTANCE_CFG_VM()->set_autostart(vm_index, req->auto_start);
+    GET_INSTANCE_CFG_VM()->set_name(vm_index, req->name);
+    GET_INSTANCE_CFG_VM()->set_base_path(vm_index, req->base_path);
+    GET_INSTANCE_CFG_VM()->set_nettype(vm_index, req->nettype);
+    GET_INSTANCE_CFG_VM()->set_nethwlink(vm_index, req->nethwlink);
+    GET_INSTANCE_CFG_VM()->set_nethwaddr(vm_index, req->nethwaddr);
 
     return sizeof(struct res_vmset_t);
 }

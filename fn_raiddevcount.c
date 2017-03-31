@@ -6,8 +6,8 @@
 
 #include "iopcdefine.h"
 #include "iopcops_misc.h"
-#include "iopcops_cfg_bdb_status.h"
-#include "iopcops_cfg_bdb_platform.h"
+#include "iopcops_cfg_status.h"
+#include "iopcops_cfg_platform.h"
 #include "iopccmd_raiddevcount.h"
 
 uint32_t hn_raiddevcount(uint8_t* preq, uint8_t* pres)
@@ -18,7 +18,7 @@ uint32_t hn_raiddevcount(uint8_t* preq, uint8_t* pres)
     res->status = 0;
 
     printf("%s get...\n", __func__);
-    res->count = GET_INSTANCE(ops_cfg_bdb_platform)->get_raid_size(platform_idx);
+    res->count = GET_INSTANCE_CFG_PLATFORM()->get_raid_size(platform_idx);
     printf("%s:count%d\n", __func__, res->count);
 
     return sizeof(struct res_raiddevcount_t);

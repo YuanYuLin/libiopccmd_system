@@ -6,8 +6,8 @@
 
 #include "iopcdefine.h"
 #include "iopcops_misc.h"
-#include "iopcops_cfg_bdb_status.h"
-#include "iopcops_cfg_bdb_vm.h"
+#include "iopcops_cfg_status.h"
+#include "iopcops_cfg_vm.h"
 #include "iopccmd_vmcount.h"
 
 uint32_t hn_vmcount(uint8_t* preq, uint8_t* pres)
@@ -17,7 +17,7 @@ uint32_t hn_vmcount(uint8_t* preq, uint8_t* pres)
     uint8_t vm_count = 0;
     res->status = 0;
 
-    vm_count = GET_INSTANCE(ops_cfg_bdb_vm)->get_cfg_size();
+    vm_count = GET_INSTANCE_CFG_VM()->get_cfg_size();
     res->count = vm_count;
 
     return sizeof(struct res_vmcount_t);

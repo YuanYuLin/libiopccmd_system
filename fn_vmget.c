@@ -6,8 +6,8 @@
 
 #include "iopcdefine.h"
 #include "iopcops_misc.h"
-#include "iopcops_cfg_bdb_status.h"
-#include "iopcops_cfg_bdb_vm.h"
+#include "iopcops_cfg_status.h"
+#include "iopcops_cfg_vm.h"
 #include "iopccmd_vmget.h"
 
 uint32_t hn_vmget(uint8_t* preq, uint8_t* pres)
@@ -25,7 +25,7 @@ uint32_t hn_vmget(uint8_t* preq, uint8_t* pres)
     res->status = 0;
     vm_index = req->index;
 
-    vm_count = GET_INSTANCE(ops_cfg_bdb_vm)->get_cfg_size();
+    vm_count = GET_INSTANCE_CFG_VM()->get_cfg_size();
     if(vm_index >= vm_count) {
 	    res->status = 1;
 	    return sizeof(struct res_vmget_t);
@@ -38,16 +38,16 @@ uint32_t hn_vmget(uint8_t* preq, uint8_t* pres)
     memset(vm_nethwaddr, 0, VM_NETHWADDR_LEN);
 
     res->index = vm_index;
-    res->auto_start = GET_INSTANCE(ops_cfg_bdb_vm)->get_autostart(vm_index);
-    len = GET_INSTANCE(ops_cfg_bdb_vm)->get_name(vm_index, &vm_name[0]);
+    res->auto_start = GET_INSTANCE_CFG_VM()->get_autostart(vm_index);
+    len = GET_INSTANCE_CFG_VM()->get_name(vm_index, &vm_name[0]);
     memcpy(res->name, vm_name, len);
-    len = GET_INSTANCE(ops_cfg_bdb_vm)->get_base_path(vm_index, &vm_basepath[0]);
+    len = GET_INSTANCE_CFG_VM()->get_base_path(vm_index, &vm_basepath[0]);
     memcpy(res->base_path, vm_basepath, len);
-    len = GET_INSTANCE(ops_cfg_bdb_vm)->get_nettype(vm_index, &vm_nettype[0]);
+    len = GET_INSTANCE_CFG_VM()->get_nettype(vm_index, &vm_nettype[0]);
     memcpy(res->nettype, vm_nettype, len);
-    len = GET_INSTANCE(ops_cfg_bdb_vm)->get_nethwlink(vm_index, &vm_nethwlink[0]);
+    len = GET_INSTANCE_CFG_VM()->get_nethwlink(vm_index, &vm_nethwlink[0]);
     memcpy(res->nethwlink, vm_nethwlink, len);
-    len = GET_INSTANCE(ops_cfg_bdb_vm)->get_nethwaddr(vm_index, &vm_nethwaddr[0]);
+    len = GET_INSTANCE_CFG_VM()->get_nethwaddr(vm_index, &vm_nethwaddr[0]);
     memcpy(res->nethwaddr, vm_nethwaddr, len);
 
     return sizeof(struct res_vmget_t);

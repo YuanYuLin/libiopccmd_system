@@ -5,9 +5,9 @@
 #include <unistd.h>
 
 #include "iopcdefine.h"
-#include "iopcops_cfg_bdb_status.h"
+#include "iopcops_cfg_status.h"
 #include "iopcops_misc.h"
-#include "iopcops_cfg_bdb_network.h"
+#include "iopcops_cfg_network.h"
 #include "iopccmd_service.h"
 
 #define SERVICE_NAME		"netdev"
@@ -51,38 +51,38 @@ static void* action_start(void* arg)
 
     printf("Starting Network Dev...\n");
 
-    GET_INSTANCE(ops_cfg_bdb_status)->wait_service_started(SERVICE_WAIT);
+    GET_INSTANCE_CFG_STATUS()->wait_service_started(SERVICE_WAIT);
     //printf("%s started\n", SERVICE_MOUNT_BASE);
 
-    GET_INSTANCE(ops_misc)->create_system_by_list(dev_init_list_size, &dev_init_list[0]);
+    GET_INSTANCE_MISC_OBJ()->create_system_by_list(dev_init_list_size, &dev_init_list[0]);
 
-    GET_INSTANCE(ops_cfg_bdb_network)->loadall();
+    GET_INSTANCE_CFG_NETWORK()->loadall();
 
-    no_interfaces = GET_INSTANCE(ops_cfg_bdb_network)->get_no_networks();
+    no_interfaces = GET_INSTANCE_CFG_NETWORK()->get_no_networks();
     printf("no ifcs:%d\n", no_interfaces);
 
     for(i=0;i<no_interfaces;i++) {
         memset(ifc_name, 0, STR_LEN);
-        str_len = GET_INSTANCE(ops_cfg_bdb_network)->get_interface_name(i, &ifc_name[0]);
+        str_len = GET_INSTANCE_CFG_NETWORK()->get_interface_name(i, &ifc_name[0]);
         
-	is_up = GET_INSTANCE(ops_cfg_bdb_network)->is_up(i);
+	is_up = GET_INSTANCE_CFG_NETWORK()->is_up(i);
         
-	ifc_type = GET_INSTANCE(ops_cfg_bdb_network)->get_type(i);
+	ifc_type = GET_INSTANCE_CFG_NETWORK()->get_type(i);
 
-        is_setup_hwaddress = GET_INSTANCE(ops_cfg_bdb_network)->is_setup_hwaddress(i);
+        is_setup_hwaddress = GET_INSTANCE_CFG_NETWORK()->is_setup_hwaddress(i);
 
 	memset(ifc_hwaddress, 0, STR_LEN);
-        str_len = GET_INSTANCE(ops_cfg_bdb_network)->get_hwaddress(i, &ifc_hwaddress[0]);
+        str_len = GET_INSTANCE_CFG_NETWORK()->get_hwaddress(i, &ifc_hwaddress[0]);
 
-        is_dhcp = GET_INSTANCE(ops_cfg_bdb_network)->is_dhcp(i);
+        is_dhcp = GET_INSTANCE_CFG_NETWORK()->is_dhcp(i);
 
-        is_setup_ipaddress = GET_INSTANCE(ops_cfg_bdb_network)->is_setup_ipaddress(i);
+        is_setup_ipaddress = GET_INSTANCE_CFG_NETWORK()->is_setup_ipaddress(i);
 
 	memset(ifc_ipaddress, 0, STR_LEN);
-	str_len = GET_INSTANCE(ops_cfg_bdb_network)->get_ipaddress(i, &ifc_ipaddress[0]);
+	str_len = GET_INSTANCE_CFG_NETWORK()->get_ipaddress(i, &ifc_ipaddress[0]);
 
 	memset(ifc_ipnetmask, 0, STR_LEN);
-	str_len = GET_INSTANCE(ops_cfg_bdb_network)->get_ipnetmask(i, &ifc_ipnetmask[0]);
+	str_len = GET_INSTANCE_CFG_NETWORK()->get_ipnetmask(i, &ifc_ipnetmask[0]);
 
 	printf("*************************\n");
 	printf("%s,%d,%d,%d,%s,%d,%d,%s,%s\n", ifc_name, is_up, ifc_type, is_setup_hwaddress, ifc_hwaddress, is_dhcp, is_setup_ipaddress, ifc_ipaddress, ifc_ipnetmask);
@@ -95,21 +95,21 @@ static void* action_start(void* arg)
 	    	memset(cmd_str, 0, STR_LEN);
 		split_vlan_ifcname(vlan_ifc, ifc_name, ".");
 		sprintf(cmd_str, "vconfig add %s %s", vlan_ifc[0], vlan_ifc[1]);
-		GET_INSTANCE(ops_misc)->execute_cmd(cmd_str, NULL);
+		GET_INSTANCE_MISC_OBJ()->execute_cmd(cmd_str, NULL);
 		printf("%s\n", cmd_str);
 	    break;
             case NETWORK_BRIDGE:
-                GET_INSTANCE(ops_misc)->execute_cmd("echo 1 > /proc/sys/net/ipv4/ip_forward", NULL);
+                GET_INSTANCE_MISC_OBJ()->execute_cmd("echo 1 > /proc/sys/net/ipv4/ip_forward", NULL);
                 memset(cmd_str, 0, STR_LEN);
                 sprintf(cmd_str, "brctl addbr %s", ifc_name);
-                GET_INSTANCE(ops_misc)->execute_cmd(cmd_str, NULL);
-                no_of_consist_interfaces = GET_INSTANCE(ops_cfg_bdb_network)->get_no_consist_interfaces(i);
+                GET_INSTANCE_MISC_OBJ()->execute_cmd(cmd_str, NULL);
+                no_of_consist_interfaces = GET_INSTANCE_CFG_NETWORK()->get_no_consist_interfaces(i);
                 for(j=0;j<no_of_consist_interfaces;j++) {
                     memset(consist_ifc, 0, STR_LEN);
-                    str_len = GET_INSTANCE(ops_cfg_bdb_network)->get_consist_interfaces(i, j, &consist_ifc[0]);
+                    str_len = GET_INSTANCE_CFG_NETWORK()->get_consist_interfaces(i, j, &consist_ifc[0]);
                     memset(cmd_str, 0, STR_LEN);
 	            sprintf(cmd_str, "brctl addif %s %s", ifc_name, consist_ifc);
-	            GET_INSTANCE(ops_misc)->execute_cmd(cmd_str, NULL);
+	            GET_INSTANCE_MISC_OBJ()->execute_cmd(cmd_str, NULL);
 	        }
             break;
             default:
@@ -120,18 +120,18 @@ static void* action_start(void* arg)
                 memset(cmd_str, 0, STR_LEN);
 		printf("%s\n", cmd_str);
                 sprintf(cmd_str, "ifconfig %s hw ether %s", ifc_name, ifc_hwaddress);
-                GET_INSTANCE(ops_misc)->execute_cmd(cmd_str, NULL);
+                GET_INSTANCE_MISC_OBJ()->execute_cmd(cmd_str, NULL);
             }
 
             memset(cmd_str, 0, STR_LEN);
             sprintf(cmd_str, "ip link set up dev %s", ifc_name);
-            GET_INSTANCE(ops_misc)->execute_cmd(cmd_str, NULL);
+            GET_INSTANCE_MISC_OBJ()->execute_cmd(cmd_str, NULL);
 	    printf("%s\n", cmd_str);
 
             while(1) {
-		printf("%s is up:%d?\n", ifc_name, GET_INSTANCE(ops_misc)->is_netdev_up(ifc_name));
+		printf("%s is up:%d?\n", ifc_name, GET_INSTANCE_MISC_OBJ()->is_netdev_up(ifc_name));
 
-                if(GET_INSTANCE(ops_misc)->is_netdev_up(ifc_name) < 0) {
+                if(GET_INSTANCE_MISC_OBJ()->is_netdev_up(ifc_name) < 0) {
                     sleep(1);
                     printf("IFC: %s is not ready\n", ifc_name);
                     continue;
@@ -144,12 +144,12 @@ static void* action_start(void* arg)
                 memset(cmd_str, 0, STR_LEN);
                 sprintf(cmd_str, "udhcpc -i %s -b -p /tmp/udhcpc.pid", ifc_name);
 		printf("cmd:%s\n", cmd_str);
-                GET_INSTANCE(ops_misc)->execute_cmd(cmd_str, NULL);
+                GET_INSTANCE_MISC_OBJ()->execute_cmd(cmd_str, NULL);
             } else {
                 if(is_setup_ipaddress) {
 			memset(cmd_str, 0, STR_LEN);
 			sprintf(cmd_str, "ifconfig %s %s netmask %s", ifc_name, ifc_ipaddress, ifc_ipnetmask);
-			GET_INSTANCE(ops_misc)->execute_cmd(cmd_str, NULL);
+			GET_INSTANCE_MISC_OBJ()->execute_cmd(cmd_str, NULL);
                 }
             }
         }
@@ -159,8 +159,8 @@ static void* action_start(void* arg)
     if(0)
 	    printf("%d\n", str_len);
 
-    GET_INSTANCE(ops_cfg_bdb_status)->set_service_started(SERVICE_NAME);
-    GET_INSTANCE(ops_cfg_bdb_status)->wait_service_stoped(SERVICE_NAME);
+    GET_INSTANCE_CFG_STATUS()->set_service_started(SERVICE_NAME);
+    GET_INSTANCE_CFG_STATUS()->wait_service_stoped(SERVICE_NAME);
 
     pthread_exit((void*)0);
     return 0;
@@ -169,7 +169,7 @@ static void* action_start(void* arg)
 static void* action_stop(void* arg)
 {
 
-    GET_INSTANCE(ops_cfg_bdb_status)->set_service_stoped(SERVICE_NAME);
+    GET_INSTANCE_CFG_STATUS()->set_service_stoped(SERVICE_NAME);
     return 0;
 }
 
@@ -188,11 +188,11 @@ uint32_t hn_netdev(uint8_t* preq, uint8_t* pres)
     case SERVICE_ACTION_STATUS:
     break;
     case SERVICE_ACTION_START:
-        GET_INSTANCE(ops_cfg_bdb_status)->set_service_starting(SERVICE_NAME);
-        GET_INSTANCE(ops_misc)->create_task(action_start);
+        GET_INSTANCE_CFG_STATUS()->set_service_starting(SERVICE_NAME);
+        GET_INSTANCE_MISC_OBJ()->create_task(action_start);
     break;
     case SERVICE_ACTION_STOP:
-        GET_INSTANCE(ops_cfg_bdb_status)->set_service_stoping(SERVICE_NAME);
+        GET_INSTANCE_CFG_STATUS()->set_service_stoping(SERVICE_NAME);
         action_stop(NULL);
     break;
     case SERVICE_ACTION_RESTART:
@@ -203,7 +203,7 @@ uint32_t hn_netdev(uint8_t* preq, uint8_t* pres)
     break;
     }
 
-    res->service_status = GET_INSTANCE(ops_cfg_bdb_status)->get_service_status(SERVICE_NAME);
+    res->service_status = GET_INSTANCE_CFG_STATUS()->get_service_status(SERVICE_NAME);
     res->action = req->action;
 
     return sizeof(struct res_service_t);
