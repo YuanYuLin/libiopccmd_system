@@ -1,0 +1,5 @@
+config BR2_PACKAGE_LIBIOPCCMD_SYSTEM
+	bool "libiopccmd_system"
+	select BR2_PACKAGE_LIBIOPCCOMMON
+	help
+	  The system commands library of IOPC.
