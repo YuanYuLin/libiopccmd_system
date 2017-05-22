@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
-#include <lxccontainer.h>
+//#include <lxccontainer.h>
 
 #include "iopcdefine.h"
 #include "iopcops_misc.h"
@@ -34,6 +34,8 @@ static struct root_t init_list[] = {
 
 static void startByIndex(uint8_t cfg_idx)
 {
+//TODO
+#if 0
     struct lxc_container *container;
     uint8_t vm_autostart = 0;
     uint8_t vm_name[STR_LEN];
@@ -166,6 +168,7 @@ static void startByIndex(uint8_t cfg_idx)
         } else {
             printf("Not AutoStart [%s]\n", vm_name);
 	}
+#endif
 }
 
 #define TASK_ARG(type, src, dst) \

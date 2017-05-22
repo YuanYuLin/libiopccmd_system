@@ -44,7 +44,8 @@ uint32_t hn_mkbtrfs(uint8_t* preq, uint8_t* pres)
     res->progress_id = progress_id;
     memset(cmd_str, 0, STR_LEN);
 
-    sprintf(cmd_str, "mkfs.btrfs -f -m %s -d %s ", req->type);
+    //TODO
+    //sprintf(cmd_str, "mkfs.btrfs -f -m %s -d %s ", req->type);
     if(req->dev_size < MIN_RAID_COUNT) {
         res->status = 2;
         GET_INSTANCE_CFG_STATUS()->set_progress_status(PROGRESS_NAME, STAGE_STATUS(PS_STAGE_FAILED | 2));

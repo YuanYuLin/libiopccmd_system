@@ -2,7 +2,8 @@
 TARGET = libiopccmd_system.so
 
 CFLAGS += -I$(SDKSTAGE)/usr/include/
-CFLAGS += -I$(SDKSTAGE)/usr/include/iopccommon
+CFLAGS += -I$(SDKSTAGE)/usr/include/libiopccommon
+CFLAGS += -I$(SDKSTAGE)/usr/include/libmicrohttpd
 CFLAGS += -I$(SDKSTAGE)/usr/include/lxc
 
 LDFLAGS += -L$(SDKSTAGE)/usr/lib/ 
